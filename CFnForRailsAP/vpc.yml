@@ -1,0 +1,128 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CFn for RailsAp VPC
+
+Resources:
+  CFnVPCforRails:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 192.168.0.0/16
+      InstanceTenancy: default
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: CFnVPCForRails
+
+  CFnPublicSubnet1a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 192.168.1.0/24
+      VpcId: !Ref CFnVPCforRails
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: CFn-PublicSubnet-1a
+
+  CFnPublicSubnet1c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 192.168.2.0/24
+      VpcId: !Ref CFnVPCforRails
+      AvailabilityZone: !Select [ 1, !GetAZs ]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: CFn-PublicSubnet-1c
+
+  CFnPrivateSubnet1a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 192.168.11.0/24
+      VpcId: !Ref CFnVPCforRails
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+      Tags:
+        - Key: Name
+          Value: CFn-PrivateSubnet-1a
+
+  CFnPrivateSubnet1c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 192.168.12.0/24
+      VpcId: !Ref CFnVPCforRails
+      AvailabilityZone: !Select [ 1, !GetAZs ]
+      Tags:
+        - Key: Name
+          Value: CFn-PrivateSubnet-1c
+
+  CFnVPCIGWforRails:
+    Type: AWS::EC2::InternetGateway
+    Properties: 
+      Tags:
+        - Key: Name
+          Value: CFn-VPCIGWforRails
+
+  CFnVPCIGWAttach:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref CFnVPCIGWforRails
+      VpcId: !Ref CFnVPCforRails
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref CFnVPCforRails
+      Tags:
+        - Key: Name
+          Value: Public Route
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    # DependsOn: CFnVPCIGWforRails
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref CFnVPCIGWforRails
+
+  PublicSubnet1aAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref CFnPublicSubnet1a
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnet1cAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref CFnPublicSubnet1c
+      RouteTableId: !Ref PublicRouteTable
+
+Outputs:
+  VPCID:
+    Description: VPC ID
+    Value: !Ref CFnVPCforRails
+    Export:
+      Name: !Sub ${AWS::StackName}-VPCID
+
+  PublicSubnet1a:
+    Description: PublicSubnet1a
+    Value: !Ref CFnPublicSubnet1a
+    Export:
+      Name: !Sub ${AWS::StackName}-PublicSubnet1a
+
+  PublicSubnet1c:
+    Description: PublicSubnet-1c
+    Value: !Ref CFnPublicSubnet1c
+    Export:
+      Name: !Sub ${AWS::StackName}-PublicSubnet1c
+
+  PrivateSubnet1a:
+    Description: PrivateSubnet-1a
+    Value: !Ref CFnPrivateSubnet1a
+    Export:
+      Name: !Sub ${AWS::StackName}-PrivateSubnet1a
+
+  PrivateSubnet2:
+    Description: PrivateSubnet-1c
+    Value: !Ref CFnPrivateSubnet1c
+    Export:
+      Name: !Sub ${AWS::StackName}-PrivateSubnet1c
