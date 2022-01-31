@@ -104,7 +104,7 @@ Outputs:
       Name: !Sub ${AWS::StackName}-VPCID
 
   PublicSubnet1a:
-    Description: PublicSubnet1a
+    Description: PublicSubnet-1a
     Value: !Ref CFnPublicSubnet1a
     Export:
       Name: !Sub ${AWS::StackName}-PublicSubnet1a
