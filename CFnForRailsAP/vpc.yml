@@ -121,7 +121,7 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}-PrivateSubnet1a
 
-  PrivateSubnet2:
+  PrivateSubnet1c:
     Description: PrivateSubnet-1c
     Value: !Ref CFnPrivateSubnet1c
     Export:

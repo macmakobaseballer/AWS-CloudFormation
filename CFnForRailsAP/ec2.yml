@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Hands-on template for Rails EC2
+
+Parameters:
+  VPCStack:
+    Type: String
+    Default: CFn-VPC-for-WebServer
+  EC2AMI:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  EC2InstanceType:
+    Type: String
+    Default: t2.nano
+  EC2KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: SSH public key
+    Default: RaiseTech-AWS 
+
+Resources:
+  CFnEC2forWebServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref EC2AMI
+      InstanceType: !Ref EC2InstanceType
+      KeyName: !Ref EC2KeyName
+      SubnetId: !ImportValue CFnPublicSubnet1a
+      UserData: !Base64 |
+        #! /bin/bash
+        sudo yum update -y
+      SecurityGroupIds:
+        - !Ref EC2SG
+
+  EC2SG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SecurityGroup for CFn Rails server
+      VpcId: !ImportValue CFnVPCforRails
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          CidrIp: 0.0.0.0/0
+          FromPort: 80
+          ToPort: 80
+
+Outputs:
+  CFnEC2forWebServer:
+    Value: !Ref CFnEC2forWebServer
+    Export:
+      Name: !Sub ${AWS::StackName}-EC2WebServer01
+
