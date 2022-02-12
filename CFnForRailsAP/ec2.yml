@@ -1,10 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Hands-on template for Rails EC2
+Description: CFn EC2 for RailsAP 
 
 Parameters:
-  VPCStack:
-    Type: String
-    Default: CFn-VPC-for-WebServer
   EC2AMI:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
@@ -17,13 +14,14 @@ Parameters:
     Default: RaiseTech-AWS 
 
 Resources:
-  CFnEC2forWebServer:
+  CFnEC2forRailsAPServer:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Ref EC2AMI
       InstanceType: !Ref EC2InstanceType
       KeyName: !Ref EC2KeyName
-      SubnetId: !ImportValue CFnPublicSubnet1a
+      SubnetId: !ImportValue
+          'Fn::Sub': PublicSubnet-${AWS::Region}a
       UserData: !Base64 |
         #! /bin/bash
         sudo yum update -y
@@ -33,17 +31,21 @@ Resources:
   EC2SG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: SecurityGroup for CFn Rails server
-      VpcId: !ImportValue CFnVPCforRails
+      GroupDescription: CFn SecurityGroup for RailsAP  
+      VpcId: !ImportValue CFnVPCforRails-VPCID
       SecurityGroupIngress: 
         - IpProtocol: tcp
           CidrIp: 0.0.0.0/0
           FromPort: 80
           ToPort: 80
+        - IpProtocol: SSH
+          CidrIp: 216.153.86.79/32
+          FromPort: 22
+          ToPort: 22
 
 Outputs:
   CFnEC2forWebServer:
-    Value: !Ref CFnEC2forWebServer
+    Value: !Ref CFnEC2forRailsAPServer
     Export:
       Name: !Sub ${AWS::StackName}-EC2WebServer01
 

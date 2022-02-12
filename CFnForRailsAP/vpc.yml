@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: CFn for RailsAp VPC
+Description: CFn VPC for RailsAP
 
 Resources:
   CFnVPCforRails:
