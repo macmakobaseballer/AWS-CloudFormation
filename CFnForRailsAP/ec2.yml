@@ -7,11 +7,10 @@ Parameters:
     Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
   EC2InstanceType:
     Type: String
-    Default: t2.nano
+    Default: t2.micro
   EC2KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: SSH public key
-    Default: RaiseTech-AWS 
 
 Resources:
   CFnEC2forRailsAPServer:
@@ -38,14 +37,14 @@ Resources:
           CidrIp: 0.0.0.0/0
           FromPort: 80
           ToPort: 80
-        - IpProtocol: SSH
+        - IpProtocol: tcp
           CidrIp: 216.153.86.79/32
           FromPort: 22
           ToPort: 22
 
 Outputs:
-  CFnEC2forWebServer:
+  CFnEC2forRailsAPServer:
     Value: !Ref CFnEC2forRailsAPServer
     Export:
-      Name: !Sub ${AWS::StackName}-EC2WebServer01
+      Name: !Sub ${AWS::StackName}
 

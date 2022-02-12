@@ -53,7 +53,7 @@ Resources:
       AvailabilityZone: !Sub ${AWS::Region}c
       Tags:
         - Key: Name
-          Value: !Sub PrivateSubnet-${AWS::Region}a
+          Value: !Sub PrivateSubnet-${AWS::Region}c
 
   CFnVPCIGWforRails:
     Type: AWS::EC2::InternetGateway
