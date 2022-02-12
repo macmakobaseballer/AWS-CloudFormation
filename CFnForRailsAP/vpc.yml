@@ -13,47 +13,47 @@ Resources:
         - Key: Name
           Value: CFnVPCForRails
 
-  CFnPublicSubnet1a:
+  CFnPublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: 192.168.1.0/24
       VpcId: !Ref CFnVPCforRails
-      AvailabilityZone: !Select [ 0, !GetAZs ]
+      AvailabilityZone: !Sub ${AWS::Region}a
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: CFn-PublicSubnet-1a
+          Value: !Sub PublicSubnet-${AWS::Region}a
 
-  CFnPublicSubnet1c:
+  CFnPublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: 192.168.2.0/24
       VpcId: !Ref CFnVPCforRails
-      AvailabilityZone: !Select [ 1, !GetAZs ]
+      AvailabilityZone: !Sub ${AWS::Region}c
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: CFn-PublicSubnet-1c
+          Value: !Sub PublicSubnet-${AWS::Region}c
 
-  CFnPrivateSubnet1a:
+  CFnPrivateSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: 192.168.11.0/24
       VpcId: !Ref CFnVPCforRails
-      AvailabilityZone: !Select [ 0, !GetAZs ]
+      AvailabilityZone: !Sub ${AWS::Region}a
       Tags:
         - Key: Name
-          Value: CFn-PrivateSubnet-1a
+          Value: !Sub PrivateSubnet-${AWS::Region}a
 
-  CFnPrivateSubnet1c:
+  CFnPrivateSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: 192.168.12.0/24
       VpcId: !Ref CFnVPCforRails
-      AvailabilityZone: !Select [ 1, !GetAZs ]
+      AvailabilityZone: !Sub ${AWS::Region}c
       Tags:
         - Key: Name
-          Value: CFn-PrivateSubnet-1c
+          Value: !Sub PrivateSubnet-${AWS::Region}a
 
   CFnVPCIGWforRails:
     Type: AWS::EC2::InternetGateway
@@ -74,7 +74,7 @@ Resources:
       VpcId: !Ref CFnVPCforRails
       Tags:
         - Key: Name
-          Value: Public Route
+          Value: PublicRouteTable
 
   PublicRoute:
     Type: AWS::EC2::Route
@@ -84,16 +84,16 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref CFnVPCIGWforRails
 
-  PublicSubnet1aAssociation:
+  PublicSubnet1Association:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref CFnPublicSubnet1a
+      SubnetId: !Ref CFnPublicSubnet1
       RouteTableId: !Ref PublicRouteTable
 
-  PublicSubnet1cAssociation:
+  PublicSubnet2Association:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref CFnPublicSubnet1c
+      SubnetId: !Ref CFnPublicSubnet2
       RouteTableId: !Ref PublicRouteTable
 
 Outputs:
@@ -101,28 +101,28 @@ Outputs:
     Description: VPC ID
     Value: !Ref CFnVPCforRails
     Export:
-      Name: !Sub ${AWS::StackName}-VPCID
+      Name: CFnVPCforRails-VPCID
 
-  PublicSubnet1a:
-    Description: PublicSubnet-1a
-    Value: !Ref CFnPublicSubnet1a
+  PublicSubnet1:
+    Description: CFnPublicSubnet1
+    Value: !Ref CFnPublicSubnet1
     Export:
-      Name: !Sub ${AWS::StackName}-PublicSubnet1a
+      Name: !Sub PublicSubnet-${AWS::Region}a
 
-  PublicSubnet1c:
-    Description: PublicSubnet-1c
-    Value: !Ref CFnPublicSubnet1c
+  PublicSubnet2:
+    Description: CFnPublicSubnet2
+    Value: !Ref CFnPublicSubnet2
     Export:
-      Name: !Sub ${AWS::StackName}-PublicSubnet1c
+      Name: !Sub PublicSubnet-${AWS::Region}c
 
-  PrivateSubnet1a:
-    Description: PrivateSubnet-1a
-    Value: !Ref CFnPrivateSubnet1a
+  PrivateSubnet1:
+    Description: CFnPrivateSubnet1
+    Value: !Ref CFnPrivateSubnet1
     Export:
-      Name: !Sub ${AWS::StackName}-PrivateSubnet1a
+      Name: !Sub PrivateSubnet-${AWS::Region}a
 
-  PrivateSubnet1c:
-    Description: PrivateSubnet-1c
-    Value: !Ref CFnPrivateSubnet1c
+  PrivateSubnet2:
+    Description: CFnPrivateSubnet2
+    Value: !Ref CFnPrivateSubnet2
     Export:
-      Name: !Sub ${AWS::StackName}-PrivateSubnet1c
+      Name: !Sub PrivateSubnet-${AWS::Region}c
