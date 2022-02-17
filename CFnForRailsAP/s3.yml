@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CFn S3 for RailsAP
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: Name of the bucket
+
+Resources:
+  S3BucketForRailsAP:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${BucketName}
