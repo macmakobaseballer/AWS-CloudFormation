@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CFn EC2 for RailsAP 
+
+Parameters:
+  EC2AMI:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+  EC2InstanceType:
+    Type: String
+    Default: t2.micro
+  EC2KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: SSH public key
+
+Resources:
+  CFnEC2forRailsAPServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref EC2AMI
+      InstanceType: !Ref EC2InstanceType
+      KeyName: !Ref EC2KeyName
+      SubnetId: !ImportValue
+          'Fn::Sub': PublicSubnet-${AWS::Region}a
+      UserData: !Base64 |
+        #! /bin/bash
+        yum update -y
+      SecurityGroupIds:
+        - !Ref EC2SG
+
+  EC2SG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: CFn SecurityGroup for RailsAP  
+      VpcId: !ImportValue CFnVPCforRails-VPCID
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          CidrIp: 0.0.0.0/0
+          FromPort: 80
+          ToPort: 80
+        - IpProtocol: tcp
+          CidrIp: 0.0.0.0/0
+          FromPort: 22
+          ToPort: 22
+
+Outputs:
+  CFnEC2forRailsAPServer:
+    Value: !Ref CFnEC2forRailsAPServer
+    Export:
+      Name: !Sub ${AWS::StackName}
+

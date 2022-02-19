@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CFn ALB for RailsAP 
+
+Parameters:
+  EC2Stack:
+    Type: String
+    Default: CFn-EC2Stack
+
+Resources:
+  FrontALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Ref AWS::StackName
+      Subnets:
+        - Fn::ImportValue:
+            Fn::Sub: PublicSubnet-${AWS::Region}a
+        - Fn::ImportValue: 
+            Fn::Sub: PublicSubnet-${AWS::Region}c
+      SecurityGroups: 
+        - !Ref SecurityGroupforALB
+
+  FrontALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref FrontALB
+      Port: 80
+      Protocol: HTTP 
+      DefaultActions: 
+        - Type: forward
+          TargetGroupArn: !Ref FrontALBTargetGroup
+
+  FrontALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub ${AWS::StackName}-TargetGroup
+      VpcId:
+        Fn::ImportValue: CFnVPCforRails-VPCID
+      Port: 80
+      Protocol: HTTP
+      HealthCheckPath: /.check_alive
+      Targets:
+        - Id:
+            Fn::ImportValue: 
+              Fn::Sub: ${EC2Stack}
+
+  SecurityGroupforALB:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: !Ref AWS::StackName
+      VpcId:
+        Fn::ImportValue: CFnVPCforRails-VPCID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  FrontALBEndpoint:
+    Value: !GetAtt FrontALB.DNSName
+    Export:
+      Name: !Sub ${AWS::StackName}-Endpoint
+
