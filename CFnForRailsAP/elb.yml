@@ -12,8 +12,10 @@ Resources:
     Properties:
       Name: !Ref AWS::StackName
       Subnets:
-        - Fn::ImportValue: !Sub PublicSubnet-${AWS::Region}a
-        - Fn::ImportValue: !Sub PublicSubnet-${AWS::Region}c
+        - Fn::ImportValue:
+            Fn::Sub: PublicSubnet-${AWS::Region}a
+        - Fn::ImportValue: 
+            Fn::Sub: PublicSubnet-${AWS::Region}c
       SecurityGroups: 
         - !Ref SecurityGroupforALB
 
@@ -38,7 +40,8 @@ Resources:
       HealthCheckPath: /.check_alive
       Targets:
         - Id:
-            Fn::ImportValue: !Sub ${EC2Stack}
+            Fn::ImportValue: 
+              Fn::Sub: ${EC2Stack}
 
   SecurityGroupforALB:
     Type: AWS::EC2::SecurityGroup

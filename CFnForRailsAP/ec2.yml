@@ -23,7 +23,7 @@ Resources:
           'Fn::Sub': PublicSubnet-${AWS::Region}a
       UserData: !Base64 |
         #! /bin/bash
-        sudo yum update -y
+        yum update -y
       SecurityGroupIds:
         - !Ref EC2SG
 
